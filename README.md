@@ -51,8 +51,9 @@ This will create a JAR file in the `build/libs` directory.
 When using Docker, you need to make the extension available to the Keycloak container. You can do this by:
 
 1. Mounting the JAR file into the container:
-   
+
    Add this volume mount to your Docker run command or docker-compose file:
+
    ```
    -v /path/to/keycloak-totp-api-1.0.0-all.jar:/opt/keycloak/providers/keycloak-totp-api-1.0.0-all.jar
    ```
@@ -60,8 +61,9 @@ When using Docker, you need to make the extension available to the Keycloak cont
    OR
 
 2. Copying the JAR file into a custom Docker image:
-   
+
    If you're building a custom Keycloak image, add this line to your Dockerfile:
+
    ```
    COPY keycloak-totp-api-1.0.0-all.jar /opt/keycloak/providers/
    ```
@@ -117,7 +119,7 @@ Verifies a TOTP code for a user.
 - **Request Body**:
   ```json
   {
-    "deviceName": "DeviceOne",
+    "deviceId": "DeviceId",
     "code": "866359"
   }
   ```

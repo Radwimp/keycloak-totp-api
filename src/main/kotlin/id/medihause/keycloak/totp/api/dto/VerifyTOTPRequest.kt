@@ -5,15 +5,15 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 
 @JsonSerialize
 data class VerifyTOTPRequest(
-    @JsonProperty("deviceName")
-    val deviceName: String,
+    @JsonProperty("deviceId")
+    val deviceId: String,
 
     @JsonProperty("code")
     val code: String
 ) {
     companion object {
         fun validate(request: VerifyTOTPRequest): Boolean {
-            return request.deviceName.isNotEmpty() && request.code.isNotEmpty()
+            return request.deviceId.isNotEmpty() && request.code.isNotEmpty()
         }
     }
 }

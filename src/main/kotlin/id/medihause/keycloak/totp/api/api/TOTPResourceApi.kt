@@ -77,10 +77,7 @@ class TOTPResourceApi(
             return Response.status(Response.Status.BAD_REQUEST).entity(CommonApiResponse("Invalid request")).build()
         }
 
-        val credentialModel = user.credentialManager().getStoredCredentialByNameAndType(
-            request.deviceName,
-            OTPCredentialModel.TYPE
-        )
+        val credentialModel = user.credentialManager().getStoredCredentialById(request.deviceId)
 
         if (credentialModel == null) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(CommonApiResponse("TOTP credential not found"))
