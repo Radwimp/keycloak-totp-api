@@ -26,6 +26,12 @@ class TOTPResourceApi(
     private fun authenticateSessionAndGetUser(
         userId: String
     ): UserModel {
+        val currentRealm = session.getContext().getRealm()
+        val masterRealm = session.realms().getRealmByName("master")
+            ?: throw NotFoundException("Master realm not found")
+
+        session.getContext().setRealm(masterRealm)
+        
         val auth = AppAuthManager.BearerTokenAuthenticator(session).authenticate()
 
         if (auth == null) {
@@ -35,6 +41,8 @@ class TOTPResourceApi(
         } else if (auth.token.realmAccess == null || !auth.token.realmAccess.isUserInRole("manage-totp")) {
             throw NotAuthorizedException("User is not an admin", {})
         }
+
+        session.getContext().setRealm(currentRealm)
 
         val user = session.users().getUserById(session.context.realm, userId)
             ?: throw NotFoundException("User not found")
