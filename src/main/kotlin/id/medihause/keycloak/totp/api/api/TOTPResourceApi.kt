@@ -15,6 +15,7 @@ import org.keycloak.models.credential.OTPCredentialModel
 import org.keycloak.models.utils.Base32
 import org.keycloak.models.utils.HmacOTP
 import org.keycloak.services.managers.AppAuthManager
+import org.keycloak.services.managers.AuthenticationManager
 import org.keycloak.utils.CredentialHelper
 import org.keycloak.utils.TotpUtils
 
@@ -26,13 +27,18 @@ class TOTPResourceApi(
     private fun authenticateSessionAndGetUser(
         userId: String
     ): UserModel {
+        var auth: AuthenticationManager.AuthResult? = null
+
         val currentRealm = session.getContext().getRealm()
         val masterRealm = session.realms().getRealmByName("master")
             ?: throw NotFoundException("Master realm not found")
 
-        session.getContext().setRealm(masterRealm)
-        
-        val auth = AppAuthManager.BearerTokenAuthenticator(session).authenticate()
+        auth = AppAuthManager.BearerTokenAuthenticator(session).authenticate()
+
+        if (auth == null) {
+            session.getContext().setRealm(masterRealm)
+            auth = AppAuthManager.BearerTokenAuthenticator(session).authenticate()
+        }
 
         if (auth == null) {
             throw NotAuthorizedException("Token not valid", {})
