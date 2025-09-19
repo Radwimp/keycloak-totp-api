@@ -18,6 +18,7 @@ import org.keycloak.services.managers.AppAuthManager
 import org.keycloak.services.managers.AuthenticationManager
 import org.keycloak.utils.CredentialHelper
 import org.keycloak.utils.TotpUtils
+import org.keycloak.models.utils.TimeBasedOTP
 
 class TOTPResourceApi(
     private val session: KeycloakSession,
@@ -141,7 +142,15 @@ class TOTPResourceApi(
                 .build()
         }
 
+        val totp = TimeBasedOTP(realm.otpPolicy.algorithm, realm.otpPolicy.digits, realm.otpPolicy.period, 1)
+
+        if (!totp.validateTOTP(request.initialCode, secret.toByteArray())) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                .entity(CommonApiResponse("Invalid initial TOTP code")).build()
+        }
+
         val totpCredentialModel = OTPCredentialModel.createFromPolicy(realm, secret, request.deviceName)
+
         if (!CredentialHelper.createOTPCredential(session, realm, user, request.initialCode, totpCredentialModel)) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(CommonApiResponse("Failed to create TOTP credential")).build()
